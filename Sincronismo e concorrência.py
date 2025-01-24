@@ -6,7 +6,7 @@ import time
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
 class Semaforo:
-    #Implementação simples de semáforo para controlar acesso
+    #semáforo para controlar acesso
     def __init__(self):
         self.locked = False
 
@@ -42,7 +42,7 @@ class Banco:
         # Ordena as contas por ID para evitar deadlocks
         contas = sorted([conta_origem, conta_destino], key=lambda c: c.id_conta)
 
-        # Adquire os locks na ordem dos IDs
+        # locks na ordem dos IDs
         contas[0].semaforo.acquire()
         contas[1].semaforo.acquire()
 
@@ -68,7 +68,7 @@ class Banco:
                 self.log_transacoes.append(mensagem)
                 logging.info(mensagem)
         finally:
-            # Controle os locks
+            # Controle dos locks
             contas[1].semaforo.release()
             contas[0].semaforo.release()
 
@@ -96,13 +96,12 @@ def simulador_concorrente(banco, num_operacoes_por_trabalhador, num_trabalhadore
     while trabalhadores:
         trabalhador = trabalhadores.pop(0)  # Obtém o próximo
         trabalhador()  
-
-# Configuração inicial
+# o Main
 def main():
     banco = Banco()
 
-    # Criando contas com saldos iniciais aleatórios
-    for i in range(1, 6):  
+    # Criando contas com saldos aleatórios
+    for i in range(1, 16):  
         banco.criar_conta(i, random.randint(100, 1000))
 
     logging.info("Estado inicial das contas:")
@@ -111,8 +110,8 @@ def main():
         
     logging.info(f"Saldo total inicial: {banco.saldo_total()}")
 
-    # Simulando múltiplas operações concorrentes
-    simulador_concorrente(banco, 100, 1)
+    
+    simulador_concorrente(banco, num_operacoes_por_trabalhador=4, num_trabalhadores=15)
 
     logging.info("Estado final das contas:")
     for conta in banco.contas:
