@@ -10,12 +10,12 @@ class Semaforo:
     def __init__(self):
         self.locked = False
 
-    def acquire(self):
+    def aguardar(self):
         while self.locked:
             time.sleep(0.01)  # Aguarda até que seja liberado
         self.locked = True
 
-    def release(self):
+    def liberalock(self):
         self.locked = False
 
 class ContaBancaria:
@@ -43,8 +43,8 @@ class Banco:
         contas = sorted([conta_origem, conta_destino], key=lambda c: c.id_conta)
 
         # locks na ordem dos IDs
-        contas[0].semaforo.acquire()
-        contas[1].semaforo.acquire()
+        contas[0].semaforo.aguardar()
+        contas[1].semaforo.aguardar()
 
         try:
             # Verifica saldo e realiza a transferência
@@ -54,23 +54,23 @@ class Banco:
 
                 # Registra a transação no log
                 mensagem = (
-                    f"Transferido {valor} de Conta {conta_origem.id_conta} "
+                    f"Transferido R$ {valor} de Conta {conta_origem.id_conta} "
                     f"para Conta {conta_destino.id_conta}."
-                    f" Saldos finais: {conta_origem} | {conta_destino}"
+                    f" Saldos finais: R$ {conta_origem} | R$ {conta_destino}"
                 )
                 self.log_transacoes.append(mensagem)
                 logging.info(mensagem)
             else:
                 mensagem = (
                     f"Falha na transferência: saldo insuficiente na Conta {conta_origem.id_conta}. "
-                    f"Saldo atual: {conta_origem.saldo}, Valor tentado: {valor}"
+                    f"Saldo atual: R$ {conta_origem.saldo}, Valor tentado: R$ {valor}"
                 )
                 self.log_transacoes.append(mensagem)
                 logging.info(mensagem)
         finally:
             # Controle dos locks
-            contas[1].semaforo.release()
-            contas[0].semaforo.release()
+            contas[1].semaforo.liberalock()
+            contas[0].semaforo.liberalock()
 
     def saldo_total(self):
         #Calcula o saldo total de todas as contas
@@ -83,7 +83,7 @@ def operacao_aleatoria(banco, num_operacoes):
         destino = random.choice(banco.contas)
         while destino == origem:
             destino = random.choice(banco.contas)
-        valor = random.randint(1, 100)
+        valor = random.randint(1, 350)
         banco.transferir(origem, destino, valor)
 
 def simulador_concorrente(banco, num_operacoes_por_trabalhador, num_trabalhadores):
@@ -94,7 +94,7 @@ def simulador_concorrente(banco, num_operacoes_por_trabalhador, num_trabalhadore
     ]
 
     while trabalhadores:
-        trabalhador = trabalhadores.pop(0)  # Obtém o próximo
+        trabalhador = trabalhadores.pop(0)  # o próximo
         trabalhador()  
 # o Main
 def main():
@@ -108,7 +108,7 @@ def main():
     for conta in banco.contas:
         logging.info(conta)
         
-    logging.info(f"Saldo total inicial: {banco.saldo_total()}")
+    logging.info(f"Saldo total inicial: R${banco.saldo_total()}")
 
     
     simulador_concorrente(banco, num_operacoes_por_trabalhador=4, num_trabalhadores=15)
@@ -117,10 +117,10 @@ def main():
     for conta in banco.contas:
         logging.info(conta)
 
-    logging.info(f"Saldo total final: {banco.saldo_total()}")
+    logging.info(f"Saldo total final: R${banco.saldo_total()}")
 
     # Exibindo log das transações
-    logging.info("Todos os LoGS")
+    logging.info("Todos os Logs")
     for log in banco.log_transacoes:
         logging.info(log)
 
