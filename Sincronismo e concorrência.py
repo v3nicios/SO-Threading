@@ -12,7 +12,7 @@ class Semaforo:
 
     def aguardar(self):
         while self.locked:
-            time.sleep(0.01)  # Aguarda até que seja liberado
+            time.sleep(0.01)  # timeout para liberar
         self.locked = True
 
     def liberalock(self):
@@ -29,7 +29,7 @@ class ContaBancaria:
         return f"Conta {self.id_conta} - Saldo: {self.saldo}"
 
 class Banco:
-    #Gerencia contas e permite transferências seguras entre elas
+    
     def __init__(self):
         self.contas = []
         self.log_transacoes = []  # Lista para armazenar logs das transações
@@ -87,7 +87,7 @@ def operacao_aleatoria(banco, num_operacoes):
         banco.transferir(origem, destino, valor)
 
 def simulador_concorrente(banco, num_operacoes_por_trabalhador, num_trabalhadores):
-    #Simula concorrência manualmente alternando entre trabalhadores
+    #Simula concorrência de forma manual alternando os IDs
     trabalhadores = [
         lambda: operacao_aleatoria(banco, num_operacoes_por_trabalhador)
         for _ in range(num_trabalhadores)
